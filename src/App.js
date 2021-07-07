@@ -19,7 +19,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className={`App-logo ${reverseClass}`} alt="logo" />
-        <h1>Contador : 0</h1>
+        <h1>Contador : {counter}</h1>
         <button type="button" onClick={handleIncrement}>
           Increment
         </button>
