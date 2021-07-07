@@ -1,44 +1,35 @@
-import { useEffect, useState } from 'react';
+import P from 'prop-types';
+import React, { useCallback, useState } from 'react';
 import './App.css';
+
+const Button = React.memo(function Button({ functionClick }) {
+  return (
+    <button
+      onClick={() => {
+        functionClick(10);
+      }}
+    >
+      +
+    </button>
+  );
+});
+
+Button.propTypes = {
+  functionClick: P.func,
+};
 
 function App() {
   const [counter, setCounter] = useState(0);
-  const [counter2, setCounter2] = useState(0);
 
-  //executa quando qualquer estado muda
-  useEffect(() => {
-    console.log('Sempre executa quando muda');
-  });
-
-  //executa quando é montado
-  useEffect(() => {
-    console.log('Executa quando é montado');
+  const handleIncrement = useCallback((num) => {
+    setCounter((c) => c + num);
   }, []);
-
-  //Exucuta qunado o estado do que é passado como dependencia muda
-  useEffect(() => {
-    console.log('Counter mudou para ', counter);
-  }, [counter]);
 
   return (
     <div className="App">
       <div>
         <h1>Counter: {counter}</h1>
-        <h1>Counter2: {counter2}</h1>
-        <button
-          onClick={() => {
-            setCounter(counter + 1);
-          }}
-        >
-          +
-        </button>
-        <button
-          onClick={() => {
-            setCounter2(counter2 + 1);
-          }}
-        >
-          +(2)
-        </button>
+        <Button functionClick={handleIncrement} />
       </div>
     </div>
   );
