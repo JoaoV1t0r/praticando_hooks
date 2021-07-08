@@ -1,18 +1,18 @@
 import P from 'prop-types';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 
-const Post = ({ post }) => {
-  console.log('Render 2');
+const Post = ({ post, handleCLick }) => {
   return (
     <div key={post.id} className="post">
-      <h1>{post.title}</h1>
+      <h1 onClick={() => handleCLick(post.title)}>{post.title}</h1>
       <p>{post.body}</p>
     </div>
   );
 };
 
 Post.propTypes = {
+  handleCLick: P.func,
   post: P.shape({
     id: P.number,
     body: P.string,
@@ -21,9 +21,9 @@ Post.propTypes = {
 };
 
 function App() {
-  console.log('Render 1');
   const [posts, setPosts] = useState([]);
   const [value, setValue] = useState();
+  const input = useRef(null);
 
   useEffect(() => {
     fetch('https://jsonplaceholder.typicode.com/posts')
@@ -31,9 +31,18 @@ function App() {
       .then((r) => setPosts(r));
   }, []);
 
+  useEffect(() => {
+    input.current.focus();
+  });
+
+  const handleCLick = (title) => {
+    setValue(title);
+  };
+
   return (
     <div className="App">
       <input
+        ref={input}
         type="search"
         value={value}
         onChange={(e) => {
@@ -44,7 +53,7 @@ function App() {
       <div>
         {useMemo(() => {
           return posts.map((post) => {
-            return <Post key={post.id} post={post} />;
+            return <Post key={post.id} post={post} handleCLick={handleCLick} />;
           });
         }, [posts])}
       </div>
