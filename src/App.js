@@ -1,63 +1,29 @@
-import P from 'prop-types';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext } from 'react';
 import './App.css';
 
-const Post = ({ post, handleCLick }) => {
-  return (
-    <div key={post.id} className="post">
-      <h1 onClick={() => handleCLick(post.title)}>{post.title}</h1>
-      <p>{post.body}</p>
-    </div>
-  );
+const globalState = {
+  title: 'Esse é o título',
+  counter: 0,
 };
 
-Post.propTypes = {
-  handleCLick: P.func,
-  post: P.shape({
-    id: P.number,
-    body: P.string,
-    title: P.string,
-  }),
+const GlobalContext = React.createContext();
+
+// eslint-disable-next-line
+const H1 = () => {
+  const context = useContext(GlobalContext);
+  return <h1>{context.title}</h1>;
+};
+
+// eslint-disable-next-line
+const Div = ({ chieldren }) => {
+  return <H1 />;
 };
 
 function App() {
-  const [posts, setPosts] = useState([]);
-  const [value, setValue] = useState();
-  const input = useRef(null);
-
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-      .then((r) => r.json())
-      .then((r) => setPosts(r));
-  }, []);
-
-  useEffect(() => {
-    input.current.focus();
-  });
-
-  const handleCLick = (title) => {
-    setValue(title);
-  };
-
   return (
-    <div className="App">
-      <input
-        ref={input}
-        type="search"
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-        }}
-      />
-
-      <div>
-        {useMemo(() => {
-          return posts.map((post) => {
-            return <Post key={post.id} post={post} handleCLick={handleCLick} />;
-          });
-        }, [posts])}
-      </div>
-    </div>
+    <GlobalContext.Provider value={globalState}>
+      <Div />
+    </GlobalContext.Provider>
   );
 }
 export default App;
