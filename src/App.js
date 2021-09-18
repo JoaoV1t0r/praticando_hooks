@@ -1,50 +1,42 @@
-import { useReducer } from 'react';
+import { createContext, useContext, useReducer } from 'react';
+import P from 'prop-types';
 import './App.css';
 
-const globalState = {
+export const globalState = {
   title: 'Esse é o título',
   body: 'O body do contexto',
   counter: 0,
 };
 
-// eslint-disable-next-line
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'muda':
-      return { ...state, title: 'Title Mudou' };
-    case 'conta': {
-      const { counter } = state;
-      return { ...state, counter: counter + 1 };
-    }
-  }
+export const reducer = (state, action) => {
+  console.log(action);
   return { ...state };
 };
 
-function App() {
-  // eslint-disable-next-line
+export const Context = createContext();
+export const AppContext = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, globalState);
-  // eslint-disable-next-line
-  const { title, body, counter } = state;
+  return <Context.Provider value={{ state, dispatch }}>{children}</Context.Provider>;
+};
+
+AppContext.propTypes = {
+  children: P.node,
+};
+
+export const H1 = () => {
+  const context = useContext(Context);
+  return <h1 onClick={() => context.dispatch({ type: 'CHANGE TITLE' })}>{context.state.title}</h1>;
+};
+
+function App() {
+  // const [state] = useState(globalState);
+  // const { title, body } = state;
   return (
-    <div>
-      <h1>
-        {title} | {counter}
-      </h1>
-      <button
-        onClick={() => {
-          dispatch({ type: 'muda' });
-        }}
-      >
-        Click
-      </button>
-      <button
-        onClick={() => {
-          dispatch({ type: 'conta' });
-        }}
-      >
-        Conta
-      </button>
-    </div>
+    <AppContext>
+      <div>
+        <H1 />
+      </div>
+    </AppContext>
   );
 }
 export default App;
