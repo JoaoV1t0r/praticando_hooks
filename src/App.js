@@ -1,42 +1,51 @@
-import { createContext, useContext, useReducer } from 'react';
-import P from 'prop-types';
-import './App.css';
+import { useEffect, useRef, useState } from 'react';
 
-export const globalState = {
-  title: 'Esse é o título',
-  body: 'O body do contexto',
-  counter: 0,
-};
+const useMyHook = (callBack, delay = 1000) => {
+  const saveCallBack = useRef();
 
-export const reducer = (state, action) => {
-  console.log(action);
-  return { ...state };
-};
+  useEffect(() => {
+    saveCallBack.current = callBack;
+  }, [callBack]);
 
-export const Context = createContext();
-export const AppContext = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, globalState);
-  return <Context.Provider value={{ state, dispatch }}>{children}</Context.Provider>;
-};
-
-AppContext.propTypes = {
-  children: P.node,
-};
-
-export const H1 = () => {
-  const context = useContext(Context);
-  return <h1 onClick={() => context.dispatch({ type: 'CHANGE TITLE' })}>{context.state.title}</h1>;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      saveCallBack.current();
+    }, delay);
+    return () => clearInterval(interval);
+  }, [delay]);
 };
 
 function App() {
-  // const [state] = useState(globalState);
-  // const { title, body } = state;
+  const [counter, setCounter] = useState(0);
+  const [delay, setDelay] = useState(1000);
+  // eslint-disable-next-line
+  const [incrementor, setIncrementor] = useState(100);
+
+  useMyHook(() => {
+    setCounter((c) => c + 541);
+  }, delay);
+
   return (
-    <AppContext>
-      <div>
-        <H1 />
-      </div>
-    </AppContext>
+    <div>
+      <h1>Contador: {counter}</h1>
+      <h1>Delay: {delay}</h1>
+      <button
+        onClick={() => {
+          setDelay((d) => d + incrementor);
+        }}
+      >
+        +{incrementor}
+      </button>
+      <button
+        onClick={() => {
+          setDelay((d) => d - incrementor);
+        }}
+      >
+        -{incrementor}
+      </button>
+      <br />
+      <input type="number" value={incrementor} onChange={(e) => setIncrementor(Number(e.target.value))} />
+    </div>
   );
 }
 export default App;
