@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 
 export const Home = () => {
   // eslint-disable-next-line no-unused-vars
@@ -7,20 +7,43 @@ export const Home = () => {
 
   const handleClick = () => {
     setCounted((c) => [...c, +c.slice(-1) + 1]);
+    divRef.current.handleClick();
   };
 
   useLayoutEffect(() => {
-    divRef.current.scrollTop = divRef.current.scrollHeight;
+    divRef.current.divRef.scrollTop = divRef.current.divRef.scrollHeight;
   });
 
   return (
     <>
       <button onClick={handleClick}>Counted {counted.slice(-1)}</button>
-      <div ref={divRef} style={{ height: '200px', width: '100px', overflow: 'scroll' }}>
-        {counted.map((count, index) => {
-          return <p key={`count-${index}`}>{count}</p>;
-        })}
-      </div>
+      <DisplayCounted counted={counted} ref={divRef} />
     </>
   );
 };
+
+export const DisplayCounted = forwardRef(function DisplayCounted({ counted }, ref) {
+  const [rand, setRant] = useState('0.24');
+  const divRef = useRef();
+
+  const handleClick = () => {
+    setRant(Math.random().toFixed(2));
+  };
+
+  useImperativeHandle(ref, () => ({
+    handleClick,
+    divRef: divRef.current,
+  }));
+
+  return (
+    <div ref={divRef} style={{ height: '400px', width: '300px', overflow: 'scroll' }}>
+      {counted.map((count, index) => {
+        return (
+          <p onClick={handleClick} key={`count-${index}`}>
+            {count} +++ {rand}
+          </p>
+        );
+      })}
+    </div>
+  );
+});
